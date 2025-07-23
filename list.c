@@ -36,6 +36,55 @@ containing all the strings in list joined by the separator.
 UStr join(List* list, UStr separator) {
     // TODO: implement this
 
+	if(list->size == 0) {
+		return new_ustr("");
+	}
+
+	//Calculate total bytes and codepoints for joined string
+	
+	int32_t total_bytes = 0;
+	int32_t total_codepoints = 0;
+
+	for(int32_t i = 0; i < list->size; i++) {
+		total_bytes = total_bytes + list->data[i].bytes;
+		total_codepoints = total_codepoints + list->data[i].codepoints;
+
+		if(i < list->size - 1) { // minus the null terminator
+
+			total_bytes = total_bytes + separator.bytes;
+			total_codepoints = total_codepoints + separator.codepoints;
+		}
+	}
+
+	//Allocating memory for buffer for concatenated contents
+	
+	char *result = malloc(total_bytes + 1);
+	if(result == NULL) {
+		fprintf(stderr, "Memory allocation failed in join\n");
+		exit(1);
+	}
+
+	//Copy contents into result buffer
+	
+	char *cursor = result;
+	for(int32_t i = 0; i < list->size; i++) {
+		memcpy(cursor, list->data[i].contents, list->data[i].bytes);
+		cursor = cursor + list->data[i].bytes;
+		if(i < list->size - 1) {
+			memcpy(cursor, separator.contents, separator.bytes);
+			cursor += separator.bytes;
+		}
+	}
+
+	result[total_bytes] = '\0';
+
+	//wrap the joined string in a UStr struct
+	
+	UStr joined = new_ustr(result);
+
+	free(result); //new_ustr copies the string, so we can free our buffer
+	return joined;
+
 }
 
 /*
