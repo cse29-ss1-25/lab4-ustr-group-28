@@ -30,6 +30,7 @@ int32_t len(UStr s) {
 	return s.codepoints;
 }
 
+// Helper method to count bytes
 int utf8CharLen(const char *p) {
         unsigned char c = (unsigned char)*p;
         if ((c & 0x80) == 0x00) return 1;
@@ -47,10 +48,12 @@ Returns an empty string on invalid range.
 */
 UStr substring(UStr s, int32_t start, int32_t end) {
 	UStr result = {0};
+	// Checks for invalid inputs
         if (start < 0 || end < 0 ||start > end || end > s.codepoints || !s.contents) {
                 return new_ustr("");
         }
 
+	// Checks if string contains only ascii
         if (s.is_ascii == 1) {
                 int32_t len = end - start;
                 char* copy = malloc(len + 1);
@@ -64,6 +67,7 @@ UStr substring(UStr s, int32_t start, int32_t end) {
                 return result;
         }
 
+	// If contains UTF 8 byte counting is required
         char* p = s.contents;
         int32_t idx = 0;
         char* byteStart = NULL;
@@ -106,13 +110,16 @@ Given 2 strings s1 and s2, returns a string that is the result of
 concatenating s1 and s2. 
 */
 UStr concat(UStr s1, UStr s2) {
+    // Malloc s1's bytes and s2's bytes combined
     int32_t new_byte_length = s1.byte_length + s2.byte_length;
     char* combined = malloc(new_byte_length + 1);
 
+    // Copies s1 to combined, s2 to the end of combined, and finally the null terminator
     memcpy(combined, s1.data, s1.byte_length);
     memcpy(combined + s1.byte_length, s2.data, s2.byte_length);
     combined[new_byte_length] = '\0';
 
+    // Creates a new ustr with combined and returns it
     UStr result = new_ustr(combined);
 
     return result;
