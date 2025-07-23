@@ -129,19 +129,22 @@ Returns 1 on success, 0 if the index is invalid (out of bounds).
 */
 int8_t insert(List* list, UStr s, int32_t index) {
     if (index < 0 || index > list->size) {
-	    return 0;
+        return 0;
     }
 
-    int32_t newCapacity;
+    int32_t new_capacity;
     if (list->size == list->capacity) {
-	if (list-> capacity == 0) {
-	    newCapacity = 1;
-	} else {
-	    newCapacity = list->capacity *= 2;
-	}
-        
-        UStr* new_data = realloc(list->data, new_capacity * sizeof(UStr));
+        new_capacity = (list->capacity == 0) ? 1 : list->capacity * 2;
+
+        UStr* new_data = malloc(new_capacity * sizeof(UStr));
         if (!new_data) return 0;
+
+        // Copy old data to new_data
+        for (int32_t i = 0; i < list->size; i++) {
+            new_data[i] = list->data[i];
+        }
+
+        free(list->data);
         list->data = new_data;
         list->capacity = new_capacity;
     }
@@ -152,6 +155,7 @@ int8_t insert(List* list, UStr s, int32_t index) {
 
     list->data[index] = s;
     list->size += 1;
+
     return 1;
 }
 
