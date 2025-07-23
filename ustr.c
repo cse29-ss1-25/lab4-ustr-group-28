@@ -132,10 +132,57 @@ removed from the original string.
 Returns the original string if index is out of bounds.
 */
 UStr removeAt(UStr s, int32_t index) {
-	// TODO: implement this
+	// Bounds check
+    if (index < 0 || index >= s.codepoints) {
+        return s;
+    }
 
+    // ASCII is easy
+    if (s.is_ascii) {
+        int32_t new_len = s.bytes - 1;
+        char* copy = malloc(new_len + 1);
+        if (!copy) return new_ustr("");
+        memcpy(copy, s.contents, index);
+        memcpy(copy + index, s.contents + index + 1, s.bytes - index - 1);
+        copy[new_len] = '\0';
+        UStr result = new_ustr(copy);
+        free(copy);
+        return result;
+    }
+
+    // UTF-8 handling
+    char* p = s.contents;
+    int32_t cp = 0;
+    char* byte_start = NULL;
+    char* byte_end = NULL;
+
+    while (*p) {
+        if (cp == index) {
+            byte_start = p;
+        }
+        if (cp == index + 1) {
+            byte_end = p;
+            break;
+        }
+        p += utf8CharLen(p);
+        cp++;
+    }
+
+    if (byte_start == NULL) return s;
+    if (byte_end == NULL) byte_end = s.contents + s.bytes;
+
+    int32_t new_len = s.bytes - (byte_end - byte_start);
+    char* copy = malloc(new_len + 1);
+    if (!copy) return new_ustr("");
+
+    memcpy(copy, s.contents, byte_start - s.contents); // before target
+    memcpy(copy + (byte_start - s.contents), byte_end, s.contents + s.bytes - byte_end); // after target
+
+    copy[new_len] = '\0';
+    UStr result = new_ustr(copy);
+    free(copy);
+    return result;
 }
-
 /*
 Given a string s, return s reversed. 
 
