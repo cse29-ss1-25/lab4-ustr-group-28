@@ -111,12 +111,12 @@ concatenating s1 and s2.
 */
 UStr concat(UStr s1, UStr s2) {
     // Malloc s1's bytes and s2's bytes combined
-    int32_t new_byte_length = s1.byte_length + s2.byte_length;
+    int32_t new_byte_length = s1.bytes + s2.bytes;
     char* combined = malloc(new_byte_length + 1);
 
     // Copies s1 to combined, s2 to the end of combined, and finally the null terminator
-    memcpy(combined, s1.data, s1.byte_length);
-    memcpy(combined + s1.byte_length, s2.data, s2.byte_length);
+    memcpy(combined, s1.data, s1.bytes);
+    memcpy(combined + s1.bytes, s2.data, s2.bytes);
     combined[new_byte_length] = '\0';
 
     // Creates a new ustr with combined and returns it
