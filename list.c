@@ -124,4 +124,59 @@ Note that the delimiter could be of a length of more than 1 character
 List split(UStr s, UStr separator) {
     // TODO: implement this
 
+	//Edge case: empty separator, if separator.bytes == 0 just return a lsit with the original string:
+	
+	if(separator.bytes == 0) {
+		List list = new_list(1);
+		list.data[0] = s;
+		list.size = 1;
+		return list;
+	}
+
+	//Scan s.contents for separator.contents
+	
+	List result = new_list(4); //Initial capacity; grow if needed
+
+	char* start = s.contents;
+	char* end = s.contents;
+	int32_t remaining_bytes = s.bytes;
+
+	while(remaining_bytes >= separator.bytes) {
+		
+		if(memcmp(end, separator.contents, separator.bytes) == 0) {
+                        //Found a match: create substring from start to end
+
+                        int32_t segment_len = end - start;
+                        char* segment = malloc(segment_len + 1);
+                        memcpy(segment, start, segment_len);
+                        segment[segment_len] = '\0';
+
+                        result.data[result.size++] = new_ustr(segment);
+                        free(segment);
+
+                        end = end + seperator.bytes;
+                        start = end;
+                        remaining_bytes = s.bytes - (start - s.contents);
+                }
+		
+		 else {
+                        end++;
+                        remaining_bytes--;
+
+                }
+	}
+
+        //add last segment
+
+        int32_t tail_len = s.contents + s.bytes - start;
+        char *tail = malloc(tail_len + 1);
+        memcpy(tail, start, tail_len);
+        tail[tail_len] = '\0';
+
+        result.data[result.size++] = new_ustr(tail);
+        free(tail);
+
+        return result;
+	
+
 }
