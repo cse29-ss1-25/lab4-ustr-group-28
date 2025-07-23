@@ -106,8 +106,16 @@ Given 2 strings s1 and s2, returns a string that is the result of
 concatenating s1 and s2. 
 */
 UStr concat(UStr s1, UStr s2) {
-	// TODO: implement this
+    int32_t new_byte_length = s1.byte_length + s2.byte_length;
+    char* combined = malloc(new_byte_length + 1);
 
+    memcpy(combined, s1.data, s1.byte_length);
+    memcpy(combined + s1.byte_length, s2.data, s2.byte_length);
+    combined[new_byte_length] = '\0';
+
+    UStr result = new_ustr(combined);
+
+    return result;
 }
 
 /*
