@@ -128,8 +128,31 @@ Expands the list's capacity if necessary (double the capacity, or set to 1 if 0)
 Returns 1 on success, 0 if the index is invalid (out of bounds).
 */
 int8_t insert(List* list, UStr s, int32_t index) {
-    // TODO: implement this
+    if (index < 0 || index > list->size) {
+	    return 0;
+    }
 
+    int32_t newCapacity;
+    if (list->size == list->capacity) {
+	if (list-> capacity == 0) {
+	    newCapacity = 1;
+	} else {
+	    newCapacity = list->capacity *= 2;
+	}
+        
+        UStr* new_data = realloc(list->data, new_capacity * sizeof(UStr));
+        if (!new_data) return 0;
+        list->data = new_data;
+        list->capacity = new_capacity;
+    }
+
+    for (int32_t i = list->size; i > index; --i) {
+        list->data[i] = list->data[i - 1];
+    }
+
+    list->data[index] = s;
+    list->size += 1;
+    return 1;
 }
 
 /*
