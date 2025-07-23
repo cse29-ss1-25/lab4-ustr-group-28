@@ -144,6 +144,36 @@ Example: reverse("apples🍎 and bananas🍌") = "🍌sananab dna 🍎selppa")
 UStr reverse(UStr s) {
 	// TODO: implement this
 
+int32_t len = s.codepoints;
+    char** codepoints = malloc(sizeof(char*) * len);
+    int32_t* lengths = malloc(sizeof(int32_t) * len);
+
+    int32_t i = 0, cp = 0;
+    while (s.contents[i] != '\0') {
+        int32_t cp_len = utf8_codepoint_len(&s.contents[i]);
+        codepoints[cp] = &s.contents[i];
+        lengths[cp] = cp_len;
+        i += cp_len;
+        cp++;
+    }
+
+    int32_t total_bytes = s.bytes;
+    char* reversed = malloc(total_bytes + 1);
+    int32_t offset = 0;
+
+    for (int32_t j = len - 1; j >= 0; j--) {
+        memcpy(reversed + offset, codepoints[j], lengths[j]);
+        offset += lengths[j];
+    }
+
+    reversed[total_bytes] = '\0';
+    UStr result = new_ustr(reversed);
+    free(reversed);
+    free(codepoints);
+    free(lengths);
+    return result;
+
+
 }
 
 

@@ -35,6 +35,40 @@ containing all the strings in list joined by the separator.
 */
 UStr join(List* list, UStr separator) {
     // TODO: implement this
+if (list->size == 0) {
+        return new_ustr("");
+    }
+
+    int32_t total_bytes = 0;
+    int32_t sep_count = list->size - 1;
+
+    for (int32_t i = 0; i < list->size; i++) {
+        total_bytes += list->data[i].bytes;
+    }
+
+    total_bytes += sep_count * separator.bytes;
+
+    char* result = malloc(total_bytes + 1);
+    int32_t offset = 0;
+
+    for (int32_t i = 0; i < list->size; ++i) {
+        UStr current = list->data[i];
+        memcpy(result + offset, current.contents, current.bytes);
+        offset += current.bytes;
+
+        if (i < list->size - 1) {
+            memcpy(result + offset, separator.contents, separator.bytes);
+            offset += separator.bytes;
+        }
+    }
+
+    result[total_bytes] = '\0';
+
+    UStr joined = new_ustr(result);
+    free(result);
+
+    return joined;
+
 
 	if(list->size == 0) {
 		return new_ustr("");
@@ -106,6 +140,19 @@ Returns 1 on success, 0 if the index is invalid (out of bounds).
 int8_t listRemoveAt(List* list, int32_t index) {
     // TODO: implement this
 
+	if (index < 0 || index >= list->size) {
+        return 0;  
+    }
+
+    free_ustr(list->data[index]);
+
+    for (int32_t i = index; i < list->size - 1; i++) {
+        list->data[i] = list->data[i + 1];
+    }
+
+    list->size--;
+
+    return 1;
 }
 
 /*
