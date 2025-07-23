@@ -132,6 +132,7 @@ int8_t insert(List* list, UStr s, int32_t index) {
         return 0;
     }
 
+    // Doubles capacity if needed
     int32_t new_capacity;
     if (list->size == list->capacity) {
         new_capacity = (list->capacity == 0) ? 1 : list->capacity * 2;
@@ -149,10 +150,12 @@ int8_t insert(List* list, UStr s, int32_t index) {
         list->capacity = new_capacity;
     }
 
+    // Shifts elements
     for (int32_t i = list->size; i > index; --i) {
         list->data[i] = list->data[i - 1];
     }
 
+    // Add new element and increase size by 1
     list->data[index] = s;
     list->size += 1;
 
